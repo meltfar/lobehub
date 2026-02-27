@@ -57,13 +57,10 @@ export const createFileUploadSlice = (set: Setter, get: () => FileStore, _api?: 
   new FileUploadActionImpl(set, get, _api);
 
 export class FileUploadActionImpl {
-  readonly #get: () => FileStore;
-  readonly #set: Setter;
-
-  constructor(set: Setter, get: () => FileStore, _api?: unknown) {
+  constructor(_set: Setter, _get: () => FileStore, _api?: unknown) {
+    void _set;
+    void _get;
     void _api;
-    this.#set = set;
-    this.#get = get;
   }
 
   uploadBase64FileWithProgress = async (
@@ -79,7 +76,7 @@ export class FileUploadActionImpl {
       hash,
       metadata,
       name: metadata.filename,
-      size: size,
+      size,
       url: metadata.path,
     });
     return { ...res, dimensions, filename: metadata.filename };

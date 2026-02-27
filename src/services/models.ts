@@ -104,7 +104,6 @@ export class ModelsService {
         return;
       }
 
-      console.error('download model error:', error);
       throw error;
     } finally {
       this._abortController = null;
@@ -143,13 +142,13 @@ export class ModelsService {
         let progress;
         try {
           progress = JSON.parse(update);
-        } catch (e) {
-          console.error('Error parsing progress update:', e);
-          console.error('raw data', update);
+        } catch {
+          // Silently skip malformed progress updates
+          continue;
         }
 
         if (progress.status === 'canceled') {
-          console.log('progress:', progress);
+          continue;
         }
 
         if (progress.status === 'error') {

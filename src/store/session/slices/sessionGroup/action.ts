@@ -9,19 +9,16 @@ import { type SessionGroupItem } from '@/types/session';
 import { type SessionGroupsDispatch } from './reducer';
 import { sessionGroupsReducer } from './reducer';
 
-/* eslint-disable typescript-sort-keys/interface */
-
 type Setter = StoreSetter<SessionStore>;
 export const createSessionGroupSlice = (set: Setter, get: () => SessionStore, _api?: unknown) =>
   new SessionGroupActionImpl(set, get, _api);
 
 export class SessionGroupActionImpl {
   readonly #get: () => SessionStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => SessionStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => SessionStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

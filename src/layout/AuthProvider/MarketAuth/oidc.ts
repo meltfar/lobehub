@@ -1,8 +1,12 @@
+import debug from 'debug';
+
 import { isDesktop } from '@/const/version';
 import { MARKET_OIDC_ENDPOINTS } from '@/services/_url';
 
 import { MarketAuthError } from './errors';
 import { type OIDCConfig, type PKCEParams, type TokenResponse } from './types';
+
+const log = debug('lobe-chat:market-oidc');
 
 /**
  * Market OIDC 授权工具类
@@ -24,7 +28,7 @@ export class MarketOIDC {
    * 生成 PKCE code verifier
    */
   private generateCodeVerifier(): string {
-    console.log('[MarketOIDC] Generating PKCE code verifier');
+    log('Generating PKCE code verifier');
     const array = new Uint8Array(32);
     crypto.getRandomValues(array);
     return btoa(String.fromCharCode.apply(null, Array.from(array)))
@@ -37,7 +41,7 @@ export class MarketOIDC {
    * 生成 PKCE code challenge
    */
   private async generateCodeChallenge(codeVerifier: string): Promise<string> {
-    console.log('[MarketOIDC] Generating PKCE code challenge');
+    log('Generating PKCE code challenge');
     const encoder = new TextEncoder();
     const data = encoder.encode(codeVerifier);
     const digest = await crypto.subtle.digest('SHA-256', data);
@@ -51,7 +55,7 @@ export class MarketOIDC {
    * 生成随机 state
    */
   private generateState(): string {
-    console.log('[MarketOIDC] Generating random state');
+    log('Generating random state');
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
     return btoa(String.fromCharCode.apply(null, Array.from(array)))
@@ -64,7 +68,7 @@ export class MarketOIDC {
    * 生成 PKCE 参数
    */
   async generatePKCEParams(): Promise<PKCEParams> {
-    console.log('[MarketOIDC] Generating PKCE parameters');
+    log('Generating PKCE parameters');
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
     const state = this.generateState();
@@ -73,7 +77,7 @@ export class MarketOIDC {
     sessionStorage.setItem('market_code_verifier', codeVerifier);
     sessionStorage.setItem('market_state', state);
 
-    console.log('[MarketOIDC] PKCE parameters generated and stored');
+    log('PKCE parameters generated and stored');
     return {
       codeChallenge,
       codeVerifier,
@@ -85,10 +89,10 @@ export class MarketOIDC {
    * 构建授权 URL
    */
   async buildAuthUrl(): Promise<string> {
-    console.log('[MarketOIDC] Building authorization URL');
+    log('Building authorization URL');
     const pkceParams = await this.generatePKCEParams();
 
-    console.log('[MarketOIDC] this.config:', this.config);
+    log('config: %O', this.config);
 
     const authUrl = new URL(MARKET_OIDC_ENDPOINTS.auth, this.config.baseUrl);
     authUrl.searchParams.set('client_id', this.config.clientId);
@@ -99,7 +103,7 @@ export class MarketOIDC {
     authUrl.searchParams.set('code_challenge', pkceParams.codeChallenge);
     authUrl.searchParams.set('code_challenge_method', 'S256');
 
-    console.log('[MarketOIDC] Authorization URL built:', authUrl.toString());
+    log('Authorization URL built: %s', authUrl.toString());
     return authUrl.toString();
   }
 
@@ -107,19 +111,19 @@ export class MarketOIDC {
    * 用授权码换取访问令牌
    */
   async exchangeCodeForToken(code: string, state: string): Promise<TokenResponse> {
-    console.log('[MarketOIDC] Exchanging authorization code for token');
+    log('Exchanging authorization code for token');
 
     // 验证 state 参数
     const storedState = sessionStorage.getItem('market_state');
     if (state !== storedState) {
-      console.error('[MarketOIDC] State parameter mismatch');
+      log('State parameter mismatch');
       throw new MarketAuthError('stateMismatch', { message: 'Invalid state parameter' });
     }
 
     // 获取存储的 code verifier
     const codeVerifier = sessionStorage.getItem('market_code_verifier');
     if (!codeVerifier) {
-      console.error('[MarketOIDC] Code verifier not found');
+      log('Code verifier not found');
       throw new MarketAuthError('codeVerifierMissing', { message: 'Code verifier not found' });
     }
 
@@ -143,7 +147,7 @@ export class MarketOIDC {
       const errorData = await response.json().catch(() => undefined);
       const errorMessage =
         `Token exchange failed: ${response.status} ${response.statusText} ${errorData?.error_description || errorData?.error || ''}`.trim();
-      console.error('[MarketOIDC]', errorMessage);
+      log('Token exchange failed: %s', errorMessage);
       throw new MarketAuthError('authorizationFailed', {
         message: errorMessage,
         meta: {
@@ -155,7 +159,7 @@ export class MarketOIDC {
     }
 
     const tokenData = (await response.json()) as TokenResponse;
-    console.log('[MarketOIDC] Token exchange successful');
+    log('Token exchange successful');
 
     // 清理 sessionStorage 中的临时数据
     sessionStorage.removeItem('market_code_verifier');
@@ -178,7 +182,7 @@ export class MarketOIDC {
 
     const state = sessionStorage.getItem('market_state');
     if (!state) {
-      console.error('[MarketOIDC] Missing state parameter in session storage');
+      log('Missing state parameter in session storage');
       throw new MarketAuthError('stateMissing', {
         message: 'Authorization state not found. Please try again.',
       });
@@ -188,21 +192,21 @@ export class MarketOIDC {
     let popup: Window | null = null;
     if (isDesktop) {
       // Electron 桌面端：使用 IPC 调用主进程打开系统浏览器
-      console.log('[MarketOIDC] Desktop app detected, opening system browser via IPC');
+      log('Desktop app detected, opening system browser via IPC');
       const { remoteServerService } = await import('@/services/electron/remoteServer');
 
       try {
         const result = await remoteServerService.requestMarketAuthorization({ authUrl });
         if (!result.success) {
-          console.error('[MarketOIDC] Failed to open system browser:', result.error);
+          log('Failed to open system browser: %s', result.error);
           throw new MarketAuthError('openBrowserFailed', {
             message: result.error || 'Failed to open system browser',
             meta: { error: result.error },
           });
         }
-        console.log('[MarketOIDC] System browser opened successfully');
+        log('System browser opened successfully');
       } catch (error) {
-        console.error('[MarketOIDC] Exception opening system browser:', error);
+        log('Exception opening system browser: %O', error);
         throw new MarketAuthError('openBrowserFailed', {
           cause: error,
           message: 'Failed to open system browser. Please try again.',
@@ -219,7 +223,7 @@ export class MarketOIDC {
       );
 
       if (!popup) {
-        console.error('[MarketOIDC] Failed to open authorization popup');
+        log('Failed to open authorization popup');
         throw new MarketAuthError('openPopupFailed', {
           message: 'Failed to open authorization popup. Please check popup blocker settings.',
         });
@@ -229,7 +233,8 @@ export class MarketOIDC {
     return new Promise((resolve, reject) => {
       let checkClosed: number | undefined;
 
-      // 先声明，后定义，避免相互“定义前使用”
+      // 先声明，后定义，避免相互”定义前使用”
+      // eslint-disable-next-line prefer-const
       let messageHandler: (event: MessageEvent) => void;
 
       // 清理函数
@@ -240,7 +245,7 @@ export class MarketOIDC {
 
       // 监听消息事件，等待授权完成
       messageHandler = (event: MessageEvent) => {
-        console.log('[MarketOIDC] Received message from popup:', event.data);
+        log('Received message from popup: %O', event.data);
 
         if (event.data.type === 'MARKET_AUTH_SUCCESS') {
           cleanup();
@@ -283,7 +288,7 @@ export class MarketOIDC {
    * 轮询 handoff 接口获取桌面端授权结果
    */
   private async pollDesktopHandoff(state: string): Promise<{ code: string; state: string }> {
-    console.log('[MarketOIDC] Starting desktop handoff polling with state:', state);
+    log('Starting desktop handoff polling with state: %s', state);
 
     const startTime = Date.now();
 
@@ -291,7 +296,7 @@ export class MarketOIDC {
       state,
     )}&client=${encodeURIComponent(MarketOIDC.DESKTOP_HANDOFF_CLIENT)}`;
 
-    console.log('[MarketOIDC] Poll URL:', pollUrl);
+    log('Poll URL: %s', pollUrl);
 
     while (Date.now() - startTime < MarketOIDC.DESKTOP_HANDOFF_TIMEOUT) {
       try {
@@ -302,14 +307,14 @@ export class MarketOIDC {
 
         const data = await response.json().catch(() => undefined);
 
-        console.log('[MarketOIDC] Poll response:', response.status, data);
+        log('Poll response: %d %O', response.status, data);
 
         if (
           response.status === 200 &&
           data?.status === 'success' &&
           typeof data?.code === 'string'
         ) {
-          console.log('[MarketOIDC] Desktop handoff succeeded');
+          log('Desktop handoff succeeded');
           return {
             code: data.code,
             state,
@@ -337,13 +342,13 @@ export class MarketOIDC {
 
         const errorMessage =
           data?.error || data?.message || `Handoff request failed with status ${response.status}`;
-        console.error('[MarketOIDC] Handoff polling failed:', errorMessage);
+        log('Handoff polling failed: %s', errorMessage);
         throw new MarketAuthError('handoffFailed', {
           message: errorMessage,
           meta: { data, status: response.status },
         });
       } catch (error) {
-        console.error('[MarketOIDC] Error while polling handoff endpoint:', error);
+        log('Error while polling handoff endpoint: %O', error);
         if (error instanceof MarketAuthError) {
           throw error;
         }
@@ -358,7 +363,7 @@ export class MarketOIDC {
       }
     }
 
-    console.warn('[MarketOIDC] Desktop handoff polling timed out');
+    log('Desktop handoff polling timed out');
     throw new MarketAuthError('handoffTimeout', {
       message:
         'Authorization timeout. Please complete the authorization in the browser and try again.',

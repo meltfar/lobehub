@@ -56,6 +56,20 @@ const styles = createStaticStyles(({ css }) => ({
   `,
 }));
 
+interface ListFooterProps {
+  columnWidths: { name: number; date: number; size: number };
+  dataLength: number;
+  hasMore?: boolean;
+  isLoadingMore: boolean;
+}
+
+const ListFooter = ({ context }: { context: ListFooterProps }) => {
+  const { columnWidths, dataLength, hasMore, isLoadingMore } = context;
+  if (isLoadingMore && hasMore) return <ListViewSkeleton columnWidths={columnWidths} />;
+  if (hasMore === false && dataLength > 0) return <div aria-hidden style={{ height: 96 }} />;
+  return null;
+};
+
 const ListView = memo(function ListView() {
   const [
     libraryId,
@@ -322,17 +336,6 @@ const ListView = memo(function ListView() {
     };
   }, [clearScrollTimers]);
 
-  // Memoize footer component to show skeleton loaders when loading more
-  const Footer = useCallback(() => {
-    if (isLoadingMore && hasMore) return <ListViewSkeleton columnWidths={columnWidths} />;
-
-    // Leave some padding at the end when there are no more pages,
-    // so users can clearly feel they've reached the end of the list.
-    if (hasMore === false && dataLength > 0) return <div aria-hidden style={{ height: 96 }} />;
-
-    return null;
-  }, [columnWidths, dataLength, hasMore, isLoadingMore]);
-
   if (showSkeleton) return <ListViewSkeleton columnWidths={columnWidths} />;
 
   return (
@@ -431,7 +434,7 @@ const ListView = memo(function ListView() {
           }}
         >
           <Virtuoso
-            components={{ Footer }}
+            context={{ columnWidths, dataLength, hasMore, isLoadingMore }}
             data={data}
             defaultItemHeight={48}
             endReached={handleEndReached}
@@ -440,6 +443,9 @@ const ListView = memo(function ListView() {
             overscan={48 * 5}
             ref={virtuosoRef}
             style={{ height: 'calc(100vh - 100px)' }}
+            components={{
+              Footer: ListFooter,
+            }}
             itemContent={(index, item) => {
               if (!item) return null;
               return (

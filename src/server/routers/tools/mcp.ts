@@ -86,7 +86,7 @@ export const mcpRouter = router({
         input.headers,
       );
     }),
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   // --- MCP Interaction ---
   // listTools now accepts MCPClientParams directly
   listTools: mcpProcedure

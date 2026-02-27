@@ -15,11 +15,10 @@ export const chatMemory = (set: Setter, get: () => ChatStore, _api?: unknown) =>
 
 export class ChatMemoryActionImpl {
   readonly #get: () => ChatStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => ChatStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => ChatStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

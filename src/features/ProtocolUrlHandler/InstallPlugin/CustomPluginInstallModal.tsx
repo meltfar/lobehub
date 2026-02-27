@@ -74,7 +74,7 @@ const CustomPluginInstallModal = memo<CustomPluginInstallModalProps>(
         // 自定义插件：先测试连接获取真实的 manifest
         const testParams: McpConnectionParams = {
           connection: finalConfig,
-          identifier: identifier,
+          identifier,
           metadata: {
             avatar: schema.icon,
             description: schema.description,
@@ -92,6 +92,7 @@ const CustomPluginInstallModal = memo<CustomPluginInstallModalProps>(
         }
 
         // 使用测试连接获取的真实 manifest
+        // eslint-disable-next-line prefer-const
         customPlugin = {
           customParams: {
             avatar: schema.icon,

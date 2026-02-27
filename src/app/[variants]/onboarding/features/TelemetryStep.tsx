@@ -15,6 +15,26 @@ import { ProductLogo } from '@/components/Branding';
 import { PRIVACY_URL, TERMS_URL } from '@/const/url';
 import { useUserStore } from '@/store/user';
 
+interface IconAvatarProps {
+  icon: IconProps['icon'];
+}
+
+const IconAvatar = memo<IconAvatarProps>(({ icon }) => (
+  <Block
+    shadow
+    align="center"
+    height={32}
+    justify="center"
+    padding={4}
+    variant="outlined"
+    width={32}
+  >
+    <Icon color={cssVar.colorTextDescription} icon={icon} size={16} />
+  </Block>
+));
+
+IconAvatar.displayName = 'IconAvatar';
+
 interface TelemetryStepProps {
   onNext: () => void;
 }
@@ -37,22 +57,6 @@ const TelemetryStep = memo<TelemetryStepProps>(({ onNext }) => {
     },
     [updateGeneralConfig, onNext],
   );
-
-  const IconAvatar = useCallback(({ icon }: { icon: IconProps['icon'] }) => {
-    return (
-      <Block
-        shadow
-        align="center"
-        height={32}
-        justify="center"
-        padding={4}
-        variant="outlined"
-        width={32}
-      >
-        <Icon color={cssVar.colorTextDescription} icon={icon} size={16} />
-      </Block>
-    );
-  }, []);
 
   return (
     <Flexbox gap={16}>

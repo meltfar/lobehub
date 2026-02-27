@@ -82,8 +82,8 @@ const LobehubSkillServerItem = memo<LobehubSkillServerItemProps>(({ provider, la
     pollIntervalRef.current = setInterval(async () => {
       try {
         await checkStatus(provider);
-      } catch (error) {
-        console.error('[LobehubSkill] Failed to check status:', error);
+      } catch {
+        // Silently ignore polling errors
       }
     }, POLL_INTERVAL_MS);
 
@@ -109,7 +109,7 @@ const LobehubSkillServerItem = memo<LobehubSkillServerItemProps>(({ provider, la
             checkStatus(provider);
           }
         } catch {
-          console.log('[LobehubSkill] COOP blocked window.closed access, falling back to polling');
+          // COOP blocked window.closed access, falling back to polling
           if (windowCheckIntervalRef.current) {
             clearInterval(windowCheckIntervalRef.current);
             windowCheckIntervalRef.current = null;
@@ -163,8 +163,6 @@ const LobehubSkillServerItem = memo<LobehubSkillServerItemProps>(({ provider, la
       if (event.origin !== window.location.origin) return;
 
       if (event.data?.type === 'LOBEHUB_SKILL_AUTH_SUCCESS' && event.data?.provider === provider) {
-        console.log('[LobehubSkill] OAuth success message received for provider:', provider);
-
         // Cleanup polling/window monitoring
         cleanup();
 
@@ -183,7 +181,6 @@ const LobehubSkillServerItem = memo<LobehubSkillServerItemProps>(({ provider, la
               ?.plugins || [];
           const isAlreadyEnabled = currentAgentPlugins.includes(newPluginId);
           if (!isAlreadyEnabled) {
-            console.log('[LobehubSkill] Auto-enabling plugin:', newPluginId);
             togglePlugin(newPluginId);
           }
         }

@@ -18,13 +18,10 @@ export const createGroupAgentSlice = (set: Setter, get: () => DiscoverStore, _ap
   new GroupAgentActionImpl(set, get, _api);
 
 export class GroupAgentActionImpl {
-  readonly #get: () => DiscoverStore;
-  readonly #set: Setter;
-
-  constructor(set: Setter, get: () => DiscoverStore, _api?: unknown) {
+  constructor(_set: Setter, _get: () => DiscoverStore, _api?: unknown) {
+    void _set;
+    void _get;
     void _api;
-    this.#set = set;
-    this.#get = get;
   }
 
   useGroupAgentCategories = (params: CategoryListQuery = {}): SWRResponse<CategoryItem[]> => {

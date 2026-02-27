@@ -19,13 +19,10 @@ export const createSocialSlice = (set: Setter, get: () => DiscoverStore, _api?: 
   new SocialActionImpl(set, get, _api);
 
 export class SocialActionImpl {
-  readonly #get: () => DiscoverStore;
-  readonly #set: Setter;
-
-  constructor(set: Setter, get: () => DiscoverStore, _api?: unknown) {
+  constructor(_set: Setter, _get: () => DiscoverStore, _api?: unknown) {
+    void _set;
+    void _get;
     void _api;
-    this.#set = set;
-    this.#get = get;
   }
 
   addFavorite = async (targetType: SocialTargetType, targetId: number): Promise<void> => {

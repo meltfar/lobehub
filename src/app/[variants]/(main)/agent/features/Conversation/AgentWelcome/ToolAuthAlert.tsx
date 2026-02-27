@@ -102,6 +102,7 @@ const KlavisToolAuthItem = memo<KlavisToolAuthItemProps>(({ tool, onAuthComplete
         try {
           await refreshKlavisServerTools(identifier);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.debug('[Klavis] Polling check (expected during auth):', error);
         }
       }, POLL_INTERVAL_MS);
@@ -183,7 +184,7 @@ const KlavisToolAuthItem = memo<KlavisToolAuthItemProps>(({ tool, onAuthComplete
         }
       }
     } catch (error) {
-      console.error('[ToolAuthAlert] Failed to create server:', error);
+      // Silently fail - UI will show error state
     } finally {
       setIsConnecting(false);
     }
@@ -241,7 +242,7 @@ const MarketToolAuthItem = memo<MarketToolAuthItemProps>(({ tool }) => {
     try {
       await signIn();
     } catch (error) {
-      console.error('[ToolAuthAlert] Market sign in failed:', error);
+      // Silently fail - UI will show error state
     }
   };
 

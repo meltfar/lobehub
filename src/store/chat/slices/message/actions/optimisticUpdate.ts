@@ -38,11 +38,10 @@ export const messageOptimisticUpdate = (set: Setter, get: () => ChatStore, _api?
 
 export class MessageOptimisticUpdateActionImpl {
   readonly #get: () => ChatStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => ChatStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => ChatStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

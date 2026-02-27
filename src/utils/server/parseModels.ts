@@ -20,7 +20,8 @@ export const parseModelString = async (
     const disable = item.startsWith('-');
     const nameConfig = item.startsWith('+') || item.startsWith('-') ? item.slice(1) : item;
     const [idAndDisplayName, ...capabilities] = nameConfig.split('<');
-    let [id, displayName] = idAndDisplayName.split('=');
+    const [idPart, displayName] = idAndDisplayName.split('=');
+    let id = idPart;
 
     let deploymentName: string | undefined;
 

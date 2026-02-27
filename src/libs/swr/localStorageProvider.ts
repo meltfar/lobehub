@@ -152,6 +152,7 @@ export function createLocalStorageProvider(options: LocalStorageCacheOptions = {
         if (sizeInMB > 4) {
           const reduced = entries.slice(-Math.floor(maxEntries / 2));
           localStorage.setItem(cacheKey, JSON.stringify(reduced));
+
           console.warn(`[SWR Cache] Cache too large (${sizeInMB.toFixed(2)}MB), cleaned up`);
         } else {
           localStorage.setItem(cacheKey, serialized);
@@ -164,6 +165,7 @@ export function createLocalStorageProvider(options: LocalStorageCacheOptions = {
           } catch {
             // ignore
           }
+
           console.error('[SWR Cache] Quota exceeded, cache cleared');
         } else {
           onError(error as Error);
@@ -256,6 +258,7 @@ export function clearSWRCache(cacheKey = 'lobechat-swr-cache'): void {
 
   try {
     localStorage.removeItem(cacheKey);
+    // eslint-disable-next-line no-console
     console.log('[SWR Cache] Cache cleared');
   } catch (error) {
     console.error('[SWR Cache] Failed to clear cache:', error);

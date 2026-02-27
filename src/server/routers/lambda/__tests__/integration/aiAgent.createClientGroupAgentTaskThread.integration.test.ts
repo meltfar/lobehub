@@ -1,4 +1,5 @@
 // @vitest-environment node
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { type LobeChatDatabase } from '@lobechat/database';
 import {
   agents,
@@ -221,7 +222,7 @@ describe('createClientGroupAgentTaskThread Integration', () => {
       });
 
       // Query thread messages again via API
-      const result2 = await caller.createClientGroupAgentTaskThread({
+      await caller.createClientGroupAgentTaskThread({
         groupId: testGroupId,
         instruction: 'Another task',
         parentMessageId,
@@ -231,10 +232,7 @@ describe('createClientGroupAgentTaskThread Integration', () => {
 
       // The key test: messages in a thread from different agents should all be queryable
       // This verifies the API doesn't filter by agentId
-      const [supervisorMsgInThread] = await serverDB
-        .select()
-        .from(messages)
-        .where(eq(messages.threadId, result.threadId));
+      await serverDB.select().from(messages).where(eq(messages.threadId, result.threadId));
 
       // If we directly query the database, we should find messages with different agentIds
       const threadMsgs = await serverDB

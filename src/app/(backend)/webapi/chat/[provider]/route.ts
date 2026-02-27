@@ -1,12 +1,14 @@
 import { type ChatCompletionErrorPayload, type ModelRuntime } from '@lobechat/model-runtime';
-import { AGENT_RUNTIME_ERROR_SET } from '@lobechat/model-runtime';
 import { ChatErrorType } from '@lobechat/types';
+import debug from 'debug';
 
 import { checkAuth } from '@/app/(backend)/middleware/auth';
 import { createTraceOptions, initModelRuntimeFromDB } from '@/server/modules/ModelRuntime';
 import { type ChatStreamPayload } from '@/types/openai/chat';
 import { createErrorResponse } from '@/utils/errorResponse';
 import { getTracePayload } from '@/utils/trace';
+
+const log = debug('lobe-chat:chat-route');
 
 // If user don't use fluid compute, will build  failed
 // this enforce user to enable fluid compute
@@ -53,9 +55,8 @@ export const POST = checkAuth(
 
       const error = errorContent || e;
 
-      const logMethod = AGENT_RUNTIME_ERROR_SET.has(errorType as string) ? 'warn' : 'error';
       // track the error at server side
-      console[logMethod](`Route: [${provider}] ${errorType}:`, error);
+      log('[%s] %s: %O', provider, errorType, error);
 
       return createErrorResponse(errorType, { error, ...res, provider });
     }

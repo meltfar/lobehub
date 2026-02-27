@@ -5,8 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiKeyManager } from './apiKeyManager';
 
 function generateKeys(count: number = 1) {
-  return new Array(count)
-    .fill('')
+  return Array.from({ length: count })
     .map(() => {
       return `sk-${nanoid()}`;
     })
@@ -110,7 +109,6 @@ describe('apiKeyManager', () => {
       const apiKeyManager = new ApiKeyManager();
 
       const total = apiKeys.length;
-      const rounds = total * 2;
       for (let i = 0; i < total; i++) {
         expect(apiKeyManager.pick(apiKeyStr)).toBe(apiKeys[i % total]);
       }

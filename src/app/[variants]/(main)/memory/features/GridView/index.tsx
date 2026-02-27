@@ -40,6 +40,40 @@ interface ItemActions<T> {
   onEdit?: (id: string) => void;
 }
 
+interface GridListProps extends DivProps {
+  ref?: React.RefObject<HTMLDivElement | null>;
+}
+
+interface GridContextType {
+  defaultColumnCount?: number;
+  maxItemWidth?: number;
+}
+
+const GridListWithContext = ({
+  ref,
+  ...props
+}: GridListProps & { ref?: React.RefObject<HTMLDivElement | null> }) => {
+  const context = (props as any).context as GridContextType | undefined;
+  return (
+    <Grid
+      gap={8}
+      maxItemWidth={context?.maxItemWidth ?? 240}
+      ref={ref}
+      rows={context?.defaultColumnCount ?? 3}
+      {...props}
+    />
+  );
+};
+
+const GridFooterWithContext = () => {
+  // Access context from Virtuoso - this is passed internally
+  const context = ({} as any).context as
+    | { defaultColumnCount?: number; isLoading?: boolean }
+    | undefined;
+  if (!context?.isLoading) return null;
+  return <Loading rows={context.defaultColumnCount ?? 3} viewMode={'grid'} />;
+};
+
 function GridViewInner<T extends { id: string }>({
   items,
   defaultColumnCount = 3,
@@ -57,6 +91,7 @@ function GridViewInner<T extends { id: string }>({
 
   return (
     <VirtuosoGrid
+      context={{ defaultColumnCount, isLoading, maxItemWidth }}
       customScrollParent={scrollParent}
       data={items}
       endReached={hasMore && onLoadMore ? onLoadMore : undefined}
@@ -64,18 +99,8 @@ function GridViewInner<T extends { id: string }>({
       overscan={48}
       style={{ minHeight: '100%' }}
       components={{
-        Footer: isLoading
-          ? () => <Loading rows={defaultColumnCount} viewMode={'grid'} />
-          : undefined,
-        List: (({ ref, ...props }: DivProps & { ref?: React.RefObject<HTMLDivElement | null> }) => (
-          <Grid
-            gap={8}
-            maxItemWidth={maxItemWidth}
-            ref={ref}
-            rows={defaultColumnCount}
-            {...props}
-          />
-        )) as any,
+        Footer: isLoading ? GridFooterWithContext : undefined,
+        List: GridListWithContext as any,
       }}
       itemContent={(index, item) => {
         if (!item || !item.id) {

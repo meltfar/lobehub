@@ -74,8 +74,8 @@ const LobehubSkillItem = memo<LobehubSkillItemProps>(({ provider, server }) => {
     pollIntervalRef.current = setInterval(async () => {
       try {
         await checkStatus(provider.id);
-      } catch (error) {
-        console.error('[LobehubSkill] Failed to check status:', error);
+      } catch {
+        // Silently ignore polling errors
       }
     }, POLL_INTERVAL_MS);
 
@@ -102,7 +102,7 @@ const LobehubSkillItem = memo<LobehubSkillItemProps>(({ provider, server }) => {
             setIsWaitingAuth(false);
           }
         } catch {
-          console.log('[LobehubSkill] COOP blocked window.closed access, falling back to polling');
+          // COOP blocked window.closed access, falling back to polling
           if (windowCheckIntervalRef.current) {
             clearInterval(windowCheckIntervalRef.current);
             windowCheckIntervalRef.current = null;

@@ -1,4 +1,3 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix, typescript-sort-keys/interface */
 import { type ChatToolPayload, type RuntimeStepContext, type UIChatMessage } from '@lobechat/types';
 import i18n from 'i18next';
 
@@ -19,11 +18,10 @@ export const pluginPublicApi = (set: Setter, get: () => ChatStore, _api?: unknow
 
 export class PluginPublicApiActionImpl {
   readonly #get: () => ChatStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => ChatStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => ChatStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

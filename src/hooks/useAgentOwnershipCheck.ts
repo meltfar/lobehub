@@ -1,9 +1,12 @@
+import debug from 'debug';
 import { useEffect, useState } from 'react';
 
 import { useMarketAuth } from '@/layout/AuthProvider/MarketAuth';
 import { type MarketAuthContextType } from '@/layout/AuthProvider/MarketAuth/types';
 import { marketApiService } from '@/services/marketApi';
 import { serverConfigSelectors, useServerConfigStore } from '@/store/serverConfig';
+
+const log = debug('lobe-chat:agent-ownership');
 
 interface AgentOwnershipResult {
   // null = loading, true = user owns it, false = user doesn't own it
@@ -26,7 +29,7 @@ function getCurrentAccountId(marketAuth: MarketAuthContextType): string | number
     // First try to get user info from marketAuth
     const userInfo = marketAuth.getCurrentUserInfo?.();
     if (userInfo?.accountId !== null) {
-      console.log('[useAgentOwnershipCheck] User ID from userInfo:', userInfo?.accountId);
+      log('User ID from userInfo: %s', userInfo?.accountId);
       return userInfo?.accountId ?? null;
     }
 
@@ -34,17 +37,14 @@ function getCurrentAccountId(marketAuth: MarketAuthContextType): string | number
     const userInfoData = sessionStorage.getItem('market_user_info');
     if (userInfoData) {
       const parsedUserInfo = JSON.parse(userInfoData);
-      console.log(
-        '[useAgentOwnershipCheck] User ID from sessionStorage:',
-        parsedUserInfo.accountId,
-      );
+      log('User ID from sessionStorage: %s', parsedUserInfo.accountId);
       return parsedUserInfo.accountId ?? parsedUserInfo.sub ?? null;
     }
 
-    console.warn('[useAgentOwnershipCheck] No user ID found');
+    log('No user ID found');
     return null;
   } catch (error) {
-    console.error('[useAgentOwnershipCheck] Failed to get current user ID:', error);
+    log('Failed to get current user ID: %O', error);
     return null;
   }
 }
@@ -72,7 +72,7 @@ export const checkOwnership = async ({
 }: CheckOwnershipParams): Promise<boolean> => {
   // In trustedClient mode, accessToken is not required; otherwise it is required
   if (!marketIdentifier || !accountId || (!enableMarketTrustedClient && !accessToken)) {
-    console.warn('[checkOwnership] Missing required parameters', {
+    log('Missing required parameters: %o', {
       accessToken: Boolean(accessToken),
       accountId,
       enableMarketTrustedClient,
@@ -84,7 +84,7 @@ export const checkOwnership = async ({
   const cacheKey = buildCacheKey(marketIdentifier, accountId);
   const cached = agentOwnershipCache.get(cacheKey);
   if (!skipCache && cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    console.log('[checkOwnership] Using cached result:', cached.result);
+    log('Using cached result: %s', cached.result);
     return cached.result;
   }
 
@@ -94,7 +94,7 @@ export const checkOwnership = async ({
   }
 
   const agentDetail = await marketApiService.getAgentDetail(marketIdentifier);
-  console.log('[checkOwnership] Agent detail:', agentDetail);
+  log('Agent detail: %O', agentDetail);
 
   const isOwner = `${agentDetail?.ownerId ?? ''}` === `${accountId}`;
   agentOwnershipCache.set(cacheKey, {
@@ -126,14 +126,14 @@ export const useAgentOwnershipCheck = (marketIdentifier?: string): AgentOwnershi
 
     const runOwnershipCheck = async () => {
       try {
-        console.log('[useAgentOwnershipCheck] Checking ownership for:', marketIdentifier);
+        log('Checking ownership for: %s', marketIdentifier);
 
         // Get current user ID
         const currentAccountId = getCurrentAccountId(marketAuth);
-        console.log('[useAgentOwnershipCheck] Current user ID:', currentAccountId);
+        log('Current user ID: %s', currentAccountId);
 
         if (!currentAccountId) {
-          console.warn('[useAgentOwnershipCheck] Could not get current user ID');
+          log('Could not get current user ID');
           setResult({ isOwnAgent: false });
           return;
         }

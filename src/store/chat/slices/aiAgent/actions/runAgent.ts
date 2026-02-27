@@ -27,11 +27,10 @@ export const agentSlice = (set: Setter, get: () => ChatStore, _api?: unknown) =>
 
 export class AgentActionImpl {
   readonly #get: () => ChatStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => ChatStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => ChatStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

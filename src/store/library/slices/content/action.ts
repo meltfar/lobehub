@@ -8,13 +8,10 @@ export const createContentSlice = (set: Setter, get: () => KnowledgeBaseStore, _
   new KnowledgeBaseContentActionImpl(set, get, _api);
 
 export class KnowledgeBaseContentActionImpl {
-  readonly #get: () => KnowledgeBaseStore;
-  readonly #set: Setter;
-
-  constructor(set: Setter, get: () => KnowledgeBaseStore, _api?: unknown) {
+  constructor(_set: Setter, _get: () => KnowledgeBaseStore, _api?: unknown) {
+    void _set;
+    void _get;
     void _api;
-    this.#set = set;
-    this.#get = get;
   }
 
   addFilesToKnowledgeBase = async (knowledgeBaseId: string, ids: string[]): Promise<void> => {

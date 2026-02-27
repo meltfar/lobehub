@@ -1,10 +1,13 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
+import debug from 'debug';
 import { type NextRequest } from 'next/server';
 
 import { createLambdaContext } from '@/libs/trpc/lambda/context';
 import { prepareRequestForTRPC } from '@/libs/trpc/utils/request-adapter';
 import { createResponseMeta } from '@/libs/trpc/utils/responseMeta';
 import { mobileRouter } from '@/server/routers/mobile';
+
+const log = debug('lobe-chat:trpc:mobile');
 
 const handler = (req: NextRequest) => {
   // Clone the request to avoid "Response body object should not be disturbed or locked" error
@@ -20,8 +23,8 @@ const handler = (req: NextRequest) => {
     endpoint: '/trpc/mobile',
 
     onError: ({ error, path, type }) => {
-      console.log(`Error in tRPC handler (mobile) on path: ${path}, type: ${type}`);
-      console.error(error);
+      log('Error in tRPC handler on path: %s, type: %s', path, type);
+      log('Error: %O', error);
     },
 
     req: preparedReq,

@@ -7,11 +7,31 @@ import { LoadingDots } from '@lobehub/ui/chat';
 import { Steps } from 'antd';
 import { cssVar } from 'antd-style';
 import { BrainIcon, HeartHandshakeIcon, PencilRulerIcon } from 'lucide-react';
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ProductLogo } from '@/components/Branding';
 import { useUserStore } from '@/store/user';
+
+interface IconAvatarProps {
+  icon: IconProps['icon'];
+}
+
+const IconAvatar = memo<IconAvatarProps>(({ icon }) => (
+  <Block
+    shadow
+    align="center"
+    height={32}
+    justify="center"
+    padding={4}
+    variant="outlined"
+    width={32}
+  >
+    <Icon color={cssVar.colorTextDescription} icon={icon} size={16} />
+  </Block>
+));
+
+IconAvatar.displayName = 'IconAvatar';
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -27,22 +47,6 @@ const WelcomeStep = memo<WelcomeStepProps>(({ onNext }) => {
     updateGeneralConfig({ telemetry: true });
     onNext();
   };
-
-  const IconAvatar = useCallback(({ icon }: { icon: IconProps['icon'] }) => {
-    return (
-      <Block
-        shadow
-        align="center"
-        height={32}
-        justify="center"
-        padding={4}
-        variant="outlined"
-        width={32}
-      >
-        <Icon color={cssVar.colorTextDescription} icon={icon} size={16} />
-      </Block>
-    );
-  }, []);
 
   return (
     <Flexbox gap={16}>

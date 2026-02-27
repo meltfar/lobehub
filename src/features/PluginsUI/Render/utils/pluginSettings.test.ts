@@ -9,7 +9,8 @@ describe('useOnPluginSettingsUpdate', () => {
 
   afterEach(() => {
     mockCallback.mockReset();
-    window.removeEventListener('message', () => {});
+    // Note: This is a no-op cleanup since the actual event listener was added by the hook
+    // and would have been cleaned up on unmount. This is just to reset any global state.
   });
 
   it('calls the callback when a PluginChannel updatePluginSettings message is received', () => {

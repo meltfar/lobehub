@@ -26,7 +26,6 @@ export const sendMessage = (
     if (hooks.onBeforeSendMessage) {
       const result = await hooks.onBeforeSendMessage(params);
       if (result === false) {
-        console.log('[ConversationStore] sendMessage blocked by onBeforeSendMessage hook');
         return;
       }
     }

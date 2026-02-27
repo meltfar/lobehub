@@ -530,7 +530,7 @@ export const aiAgentRouter = router({
         slug,
       });
     } catch (error: any) {
-      console.error('execAgent failed: %O', error);
+      log('execAgent failed: %O', error);
 
       if (error instanceof TRPCError) {
         throw error;
@@ -887,16 +887,6 @@ export const aiAgentRouter = router({
       const updatedMetadata = updatedThread?.metadata ?? metadata;
       const updatedStatus = updatedThread?.status ?? thread.status;
       const updatedTaskStatus = threadStatusToTaskStatus[updatedStatus] || 'processing';
-
-      // DEBUG: Log metadata for failed tasks
-      if (updatedTaskStatus === 'failed') {
-        console.log('[DEBUG] getSubAgentTaskStatus - failed task metadata:', {
-          threadId,
-          updatedMetadata,
-          'updatedMetadata?.error': updatedMetadata?.error,
-          updatedStatus,
-        });
-      }
 
       // 6. Query thread messages for result content or current activity
       const threadMessages = await ctx.messageModel.query({ threadId });

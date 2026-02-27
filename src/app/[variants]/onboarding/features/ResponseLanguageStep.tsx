@@ -24,7 +24,7 @@ const ResponseLanguageStep = memo<ResponseLanguageStepProps>(({ onBack, onNext }
   const switchLocale = useGlobalStore((s) => s.switchLocale);
   const setSettings = useUserStore((s) => s.setSettings);
 
-  const [value, setValue] = useState<Locales | ''>(normalizeLocale(navigator.language));
+  const [value, setValue] = useState<Locales | ''>(() => normalizeLocale(navigator.language));
   const [isNavigating, setIsNavigating] = useState(false);
   const isNavigatingRef = useRef(false);
 
@@ -43,22 +43,15 @@ const ResponseLanguageStep = memo<ResponseLanguageStepProps>(({ onBack, onNext }
     onBack();
   }, [onBack]);
 
-  const Message = useCallback(
-    () => (
-      <LobeMessage
-        sentences={[
-          t('responseLanguage.title'),
-          t('responseLanguage.title2'),
-          t('responseLanguage.title3'),
-        ]}
-      />
-    ),
-    [t, value],
-  );
+  const sentences = [
+    t('responseLanguage.title'),
+    t('responseLanguage.title2'),
+    t('responseLanguage.title3'),
+  ];
 
   return (
     <Flexbox gap={16}>
-      <Message />
+      <LobeMessage sentences={sentences} />
       <Flexbox horizontal align={'center'} gap={12}>
         <Select
           showSearch

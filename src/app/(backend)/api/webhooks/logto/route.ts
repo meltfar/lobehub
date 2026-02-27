@@ -1,3 +1,4 @@
+import debug from 'debug';
 import { NextResponse } from 'next/server';
 
 import { serverDB } from '@/database/server';
@@ -5,6 +6,8 @@ import { authEnv } from '@/envs/auth';
 import { WebhookUserService } from '@/server/services/webhookUser';
 
 import { validateRequest } from './validateRequest';
+
+const log = debug('lobe-chat:webhook:logto');
 
 export const POST = async (req: Request): Promise<NextResponse> => {
   const payload = await validateRequest(req, authEnv.LOGTO_WEBHOOK_SIGNING_KEY!);
@@ -18,7 +21,7 @@ export const POST = async (req: Request): Promise<NextResponse> => {
 
   const { event, data } = payload;
 
-  console.log(`logto webhook payload: ${{ data, event }}`);
+  log('webhook payload: %o', { data, event });
 
   const webhookUserService = new WebhookUserService(serverDB);
   switch (event) {

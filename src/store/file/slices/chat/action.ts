@@ -85,8 +85,7 @@ export class FileActionImpl {
       try {
         const result = await fileService.getKnowledgeItem(id);
         fileItem = result ?? undefined;
-      } catch (e) {
-        console.error('getFileItem Error:', e);
+      } catch {
         continue;
       }
 
@@ -164,7 +163,7 @@ export class FileActionImpl {
       if (isChunkingUnsupported(file.type)) return;
 
       const data = await ragService.parseFileContent(fileResult.id);
-      console.log('parseFileContent data:', data);
+      void data; // Result is processed internally by ragService
     });
 
     await Promise.all(pools);

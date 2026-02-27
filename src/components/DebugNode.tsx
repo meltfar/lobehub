@@ -12,6 +12,7 @@ const DebugNode = ({ children, trace }: DebugNodeProps) => {
   if (process.env.NODE_ENV !== 'development') return null;
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log(`[DebugNode] Suspense fallback active: ${trace}`);
   }, [trace]);
 

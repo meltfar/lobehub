@@ -9,7 +9,8 @@ describe('useOnPluginReadyForInteraction', () => {
 
   afterEach(() => {
     mockOnReady.mockReset();
-    window.removeEventListener('message', () => {});
+    // Note: This is a no-op cleanup since the actual event listener was added by the hook
+    // and would have been cleaned up on unmount. This is just to reset any global state.
   });
 
   it('sets readyForRender to true when a PluginChannel.pluginReadyForRender message is received', async () => {

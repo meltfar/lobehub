@@ -58,7 +58,7 @@ export class KlavisStoreActionImpl {
         toolName,
       });
 
-      console.log('toolsClient.klavis.callTool-response', response);
+      void response; // Response is used for success tracking
 
       this.#set(
         produce((draft: KlavisStoreState) => {
@@ -69,9 +69,7 @@ export class KlavisStoreActionImpl {
       );
 
       return { data: response, success: true };
-    } catch (error) {
-      console.error('[Klavis] Failed to call tool:', error);
-
+    } catch {
       this.#set(
         produce((draft: KlavisStoreState) => {
           draft.executingToolIds.delete(toolId);
@@ -144,9 +142,7 @@ export class KlavisStoreActionImpl {
       );
 
       return server;
-    } catch (error) {
-      console.error('[Klavis] Failed to create server:', error);
-
+    } catch {
       this.#set(
         produce((draft: KlavisStoreState) => {
           draft.loadingServerIds.delete(identifier);
@@ -165,7 +161,6 @@ export class KlavisStoreActionImpl {
     // Find server using identifier
     const server = servers.find((s) => s.identifier === identifier);
     if (!server) {
-      console.error('[Klavis] Server not found:', identifier);
       return;
     }
 
@@ -266,8 +261,6 @@ export class KlavisStoreActionImpl {
         })),
       });
     } catch (error) {
-      console.error('[Klavis] Failed to refresh tools:', error);
-
       this.#set(
         produce((draft: KlavisStoreState) => {
           // Find server using identifier
@@ -306,8 +299,8 @@ export class KlavisStoreActionImpl {
           identifier,
           instanceId: server.instanceId,
         });
-      } catch (error) {
-        console.error('[Klavis] Failed to delete server instance:', error);
+      } catch {
+        // Silently fail - server is already removed from local state
       }
     }
   };

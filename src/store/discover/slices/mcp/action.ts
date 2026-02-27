@@ -17,13 +17,10 @@ export const createMCPSlice = (set: Setter, get: () => DiscoverStore, _api?: unk
   new MCPActionImpl(set, get, _api);
 
 export class MCPActionImpl {
-  readonly #get: () => DiscoverStore;
-  readonly #set: Setter;
-
-  constructor(set: Setter, get: () => DiscoverStore, _api?: unknown) {
+  constructor(_set: Setter, _get: () => DiscoverStore, _api?: unknown) {
+    void _set;
+    void _get;
     void _api;
-    this.#set = set;
-    this.#get = get;
   }
 
   useFetchMcpDetail = ({

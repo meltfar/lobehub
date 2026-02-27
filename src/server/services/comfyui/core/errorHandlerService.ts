@@ -71,7 +71,7 @@ function extractMissingFileInfo(message: string): {
   if (!message) return null;
 
   // Check for "Expected one of:" pattern from enhanced model errors
-  const expectedPattern = /expected one of:\s*([^.]+\.(?:safetensors|ckpt|pt|pth))/i;
+  const expectedPattern = /expected one of:[^.]*(?:safetensors|ckpt|pth?)\b/i;
   const expectedMatch = message.match(expectedPattern);
 
   if (expectedMatch) {

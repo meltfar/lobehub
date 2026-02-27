@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 import { AsyncTaskModel } from '@/database/models/asyncTask';
 import { ChunkModel } from '@/database/models/chunk';
 import { DocumentModel } from '@/database/models/document';
@@ -9,6 +11,8 @@ import { FileService } from '@/server/services/file';
 import { AsyncTaskStatus, AsyncTaskType } from '@/types/asyncTask';
 import { type FileListItem } from '@/types/files';
 import { QueryFileListSchema } from '@/types/files';
+
+const log = debug('lobe-chat:knowledge-router');
 
 const knowledgeProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
@@ -78,7 +82,7 @@ export const knowledgeRouter = router({
           embeddingStatus: null,
           finishEmbedding: false,
         } as FileListItem;
-        console.log('[API getKnowledgeItems] Processing document:', {
+        log('Processing document: %o', {
           editorDataPreview: item.editorData ? JSON.stringify(item.editorData).slice(0, 100) : null,
           hasEditorData: !!item.editorData,
           id: item.id,

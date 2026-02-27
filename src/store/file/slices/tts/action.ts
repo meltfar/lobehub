@@ -15,11 +15,10 @@ export const createTTSFileSlice = (set: Setter, get: () => FileStore, _api?: unk
 
 export class TTSFileActionImpl {
   readonly #get: () => FileStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => FileStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => FileStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

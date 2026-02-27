@@ -38,7 +38,10 @@ export const useHotkeyById = (
   const ref = useHotkeys(
     hotkey,
     (...props) => {
-      if (isDev) console.log('[Hotkey]', hotkeyId);
+      if (isDev) {
+        // eslint-disable-next-line no-console
+        console.log('[Hotkey]', hotkeyId);
+      }
       return callback(...props);
     },
     {

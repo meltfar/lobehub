@@ -57,8 +57,8 @@ export const useKlavisOAuth = ({ serverStatus }: UseKlavisOAuthProps) => {
       pollIntervalRef.current = setInterval(async () => {
         try {
           await refreshKlavisServerTools(serverName);
-        } catch (error) {
-          console.debug('[Klavis] Polling check (expected during auth):', error);
+        } catch {
+          // Expected during auth flow - silently ignore
         }
       }, POLL_INTERVAL_MS);
 

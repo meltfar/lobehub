@@ -72,8 +72,6 @@ export class GroupChatSupervisor {
       const response = await this.callLLMForDecision(context);
       const result = this.parseSupervisorResponse(response, availableAgents, context);
 
-      console.log('Supervisor TODO list:', result.todos);
-
       return result;
     } catch (error) {
       // Re-throw the error so it can be caught and displayed to the user via toast
@@ -110,8 +108,6 @@ export class GroupChatSupervisor {
         context.abortController || new AbortController(),
       );
 
-      console.log('SUPERVISOR RESPONSE', JSON.stringify(response, null, 2));
-
       // Parse the response to SupervisorToolCall[]
       if (Array.isArray(response)) {
         // Tool calls come in format: [{ name: string, arguments: object }]
@@ -145,7 +141,6 @@ export class GroupChatSupervisor {
         throw this.createAbortError();
       }
 
-      console.error('Supervisor LLM error:', err);
       throw err instanceof Error ? err : new Error(String(err));
     }
   }
@@ -263,17 +258,11 @@ export class GroupChatSupervisor {
         }
         case 'wait_for_user_input': {
           // Pause conversation - no action needed, just don't add any decisions
-          console.log('DEBUG: Supervisor paused conversation:', call.parameter);
           break;
         }
         case 'trigger_agent':
         case 'trigger_agent_dm': {
           const decision = this.buildDecisionFromTool(call.parameter, availableAgents, context);
-          console.log('DEBUG: Built decision from tool:', {
-            decision,
-            parameter: call.parameter,
-            toolName: call.tool_name,
-          });
           if (decision) {
             decisions.push(decision);
           }
@@ -281,8 +270,6 @@ export class GroupChatSupervisor {
         }
       }
     });
-
-    console.log('DEBUG: Final decisions:', decisions);
 
     return { decisions, todoUpdated, todos };
   }
@@ -620,8 +607,7 @@ export class GroupChatSupervisor {
     const jsonText = response.slice(startIndex, endIndex + 1);
     try {
       return JSON.parse(jsonText);
-    } catch (error) {
-      console.error('Failed to parse JSON array from supervisor response:', error);
+    } catch {
       return null;
     }
   }

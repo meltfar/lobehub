@@ -1,4 +1,5 @@
 // @vitest-environment node
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { type LobeChatDatabase } from '@lobechat/database';
 import {
   agents,

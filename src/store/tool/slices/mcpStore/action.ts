@@ -561,7 +561,7 @@ export class PluginMCPStoreActionImpl {
         // For mcp, store connection info in customParams field first
         customParams: { mcp: finalConnection },
         identifier: plugin.identifier,
-        manifest: manifest,
+        manifest,
         settings: normalizedConfig,
         type: 'plugin',
       });
@@ -622,7 +622,6 @@ export class PluginMCPStoreActionImpl {
     } catch (e) {
       // Silently handle errors caused by cancellation
       if (abortController.signal.aborted) {
-        console.log('MCP plugin installation cancelled for:', identifier);
         return;
       }
 
@@ -804,7 +803,7 @@ export class PluginMCPStoreActionImpl {
 
       discoverService.reportMcpEvent({
         event: 'activate',
-        identifier: identifier,
+        identifier,
         source: 'self',
       });
 
@@ -841,7 +840,7 @@ export class PluginMCPStoreActionImpl {
 
     discoverService.reportMcpEvent({
       event: 'uninstall',
-      identifier: identifier,
+      identifier,
       source: 'self',
     });
   };

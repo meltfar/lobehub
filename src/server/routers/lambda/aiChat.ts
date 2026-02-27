@@ -139,6 +139,7 @@ export const aiChatRouter = router({
         topicId,
       });
 
+      // eslint-disable-next-line prefer-const
       messageId = userMessageItem.id;
       log('user message created with id: %s', messageId);
 

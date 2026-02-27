@@ -15,8 +15,15 @@ const extractTitle = (content: string): string | null => {
   if (!content) return null;
 
   // Find first markdown header (# title)
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1].trim() : null;
+  // Split by lines and find the first line starting with #
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trimStart();
+    if (trimmed.startsWith('# ')) {
+      return trimmed.slice(2).trim();
+    }
+  }
+  return null;
 };
 
 // Helper to extract preview text from note content

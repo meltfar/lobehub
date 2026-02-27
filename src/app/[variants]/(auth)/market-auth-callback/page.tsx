@@ -18,8 +18,6 @@ const MarketAuthCallbackPage = () => {
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
-    console.log('[MarketAuthCallback] Processing authorization callback');
-
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
@@ -27,7 +25,6 @@ const MarketAuthCallbackPage = () => {
     const errorDescription = urlParams.get('error_description');
 
     if (error) {
-      console.error('[MarketAuthCallback] Authorization error:', error, errorDescription);
       setStatus('error');
       setMessage(t('callback.messages.authFailed', { error: errorDescription || error }));
 
@@ -45,7 +42,6 @@ const MarketAuthCallbackPage = () => {
     }
 
     if (code && state) {
-      console.log('[MarketAuthCallback] Authorization successful, code received');
       setStatus('success');
       setMessage(t('callback.messages.successWithRedirect'));
 
@@ -75,7 +71,6 @@ const MarketAuthCallbackPage = () => {
         }
       }, 1000);
     } else {
-      console.error('[MarketAuthCallback] Missing code or state parameter');
       setStatus('error');
       setMessage(t('callback.messages.missingParams'));
 

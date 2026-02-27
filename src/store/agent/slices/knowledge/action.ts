@@ -20,11 +20,10 @@ export const createKnowledgeSlice = (set: Setter, get: () => AgentStore, _api?: 
 
 export class KnowledgeSliceActionImpl {
   readonly #get: () => AgentStore;
-  readonly #set: Setter;
 
-  constructor(set: Setter, get: () => AgentStore, _api?: unknown) {
+  constructor(_set: Setter, get: () => AgentStore, _api?: unknown) {
+    void _set;
     void _api;
-    this.#set = set;
     this.#get = get;
   }
 

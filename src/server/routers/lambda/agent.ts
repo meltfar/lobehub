@@ -1,6 +1,7 @@
 import { DEFAULT_AGENT_CONFIG, INBOX_SESSION_ID } from '@lobechat/const';
 import { type KnowledgeItem } from '@lobechat/types';
 import { KnowledgeType } from '@lobechat/types';
+import debug from 'debug';
 import { z } from 'zod';
 
 import { AgentModel } from '@/database/models/agent';
@@ -13,6 +14,8 @@ import { insertAgentSchema } from '@/database/schemas';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { AgentService } from '@/server/services/agent';
+
+const log = debug('lobe-chat:agent-router');
 
 const agentProcedure = authedProcedure.use(serverDatabase).use(async (opts) => {
   const { ctx } = opts;
@@ -213,7 +216,7 @@ export const agentRouter = router({
           if (!user) return DEFAULT_AGENT_CONFIG;
 
           const res = await ctx.agentService.createInbox();
-          console.log('create inbox session', res);
+          log('create inbox session %o', res);
         }
       }
 
